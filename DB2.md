@@ -2,6 +2,6 @@
  ***
  
  ## 1. `docker search mysql`
-  ```
+  ```vim
     docker search mysql
   ```
