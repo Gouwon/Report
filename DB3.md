@@ -22,8 +22,19 @@
      use <db-name>
      create table <table-name> (column 설정);
      ```
-       MySQL에 root 게정으로 들어간 DBA는 `create database <db-name>;` 명령어를 통해서 데이터베이스를 생성해낼 수 있다. 생성된 데이터베이스가 잘 있는지는 
+       MySQL에 root 게정으로 들어간 DBA는 `create database <db-name>;` 명령어를 통해서 데이터베이스를 생성해낼 수 있다. 생성된 데이터베이스가 잘 있는지는 `show databases;` 명령어로 확인가능하며, 해당 데이터베이스를 사용하길 원한다면 `use <db-name>` 명령어를 사용하면 된다. 지금 만들어진 데이터베이스는 빈 DB임으로 따로 `create table <table-name> (column 설정);`을 해줘야 한다.
+       
+       
     2. DBO 사용자 계정 생성하기
+       DBA, DB관리자는 사용자 계정을 생성할 수 있다. MySQL에서는 크게 사용자 생성과 권한 부여 및 적용의 2단계를 거친다.
        
        2-1. 사용자 계정 생성하기( `create user <user-name>@'<host>' identified by '<pw>';` )
-       2-2. 사용자 권한 부여 및 적용( `grant all privileges on <DB>.* to '<user-name>'@'<host>'; )
+        ```sql
+         create user <user-name>@'<host>' identified by '<pw>';
+        ```
+           사용자 계정을 생성할 때는 
+       2-2. 사용자 권한 부여 및 적용( `grant all privileges on <DB>.* to '<user-name>'@'<host>';` )
+        ```sql
+         grant all privileges on *.* to '<user-name>'@'<host>';
+         grant all privileges on <DB>.* to '<user-name>'@'<host>';
+        ```
