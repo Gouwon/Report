@@ -43,4 +43,4 @@
           사용자가 생성되고 나면 DB에 대한 권한을 지정하여 적용해주지 않으면 안 된다.
           root 사용자, DBA와 같은 권한은 `grant all privileges on *.* to '<user-name>'@'<host>';` 명령어를 쓴다. 이는 모든 DB에 모든 권한을 'grant all' 모두 다 허가해준다는 의미이다.
           따라서 보통은 `grant all privileges on <DB>.* to '<user-name>'@'<host>';` 처럼 권한을 줄 DB를 한정하여서 준다.
-          이후 권한 설정이 완료되면 `flush privileges;` 명령어르 사용하면 권한 적용이 완료된다.
+          이후 권한 설정이 완료되면 `flush privileges;` 명령어 사용하면 권한 적용이 완료된다.
