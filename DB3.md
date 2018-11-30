@@ -29,9 +29,20 @@
        DBA, DB관리자는 사용자 계정을 생성할 수 있다. MySQL에서는 크게 사용자 생성과 권한 부여 및 적용의 2단계를 거친다.
        
        2-1. 사용자 계정 생성하기( )
-        
-            사용자 계정을 생성할 때는 `create user <user-name>@'<host>' identified by '<pw>';` 를 사용한다. 중요한 것은 생성된 유저가 어디서 접근할 지에 따라서 권한을 다르게 주어야 하는 경우가 있기 때문에 `@'<host>'`에서의 "**'<host>'**" 부분에는 접속 요청이 온 localhost를 명시해서 해당 IP에서만 접근이 가능하게 하거나 어디서라도 접근할 수 있는 `%`를 적어줘서 설정할 수 있다.
+        ```sql
+         grant all privileges on *.* to '<user-name>'@'<host>';
+         grant all privileges on <DB>.* to '<user-name>'@'<host>';
+         flush privileges;
+        ```           
+          사용자 계정을 생성할 때는 `create user <user-name>@'<host>' identified by '<pw>';` 를 사용한다. 중요한 것은 생성된 유저가 어디서 접근할 지에 따라서 권한을 다르게 주어야 하는 경우가 있기 때문에 `@'<host>'`에서의 "**'<host>'**" 부분에는 접속 요청이 온 localhost를 명시해서 해당 IP에서만 접근이 가능하게 하거나 어디서라도 접근할 수 있는 `%`를 적어줘서 설정할 수 있다.
            
-       2-2. 사용자 권한 부여 및 적용(  )
-   
-         
+       2-2. 사용자 권한 부여 및 적용( `grant all privileges on <DB>.* to '<user-name>'@'<host>';` `flush privileges;` )
+        ```sql
+         grant all privileges on *.* to '<user-name>'@'<host>';
+         grant all privileges on <DB>.* to '<user-name>'@'<host>';
+         flush privileges;
+        ```   
+          사용자가 생성되고 나면 DB에 대한 권한을 지정하여 적용해주지 않으면 안 된다.
+          root 사용자, DBA와 같은 권한은 `grant all privileges on *.* to '<user-name>'@'<host>';` 명령어를 쓴다. 이는 모든 DB에 모든 권한을 'grant all' 모두 다 허가해준다는 의미이다.
+          따라서 보통은 `grant all privileges on <DB>.* to '<user-name>'@'<host>';` 처럼 권한을 줄 DB를 한정하여서 준다.
+          이후 권한 설정이 완료되면 `flush privileges;` 명령어르 사용하면 권한 적용이 완료된다.
