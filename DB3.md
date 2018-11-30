@@ -28,11 +28,9 @@
     2. DBO 사용자 계정 생성하기
        DBA, DB관리자는 사용자 계정을 생성할 수 있다. MySQL에서는 크게 사용자 생성과 권한 부여 및 적용의 2단계를 거친다.
        
-       2-1. 사용자 계정 생성하기( )
+       2-1. 사용자 계정 생성하기( `create user <user-name>@'<host>' identified by '<pw>';` )
         ```sql
-         grant all privileges on *.* to '<user-name>'@'<host>';
-         grant all privileges on <DB>.* to '<user-name>'@'<host>';
-         flush privileges;
+         create user <user-name>@'<host>' identified by '<pw>';
         ```           
           사용자 계정을 생성할 때는 `create user <user-name>@'<host>' identified by '<pw>';` 를 사용한다. 중요한 것은 생성된 유저가 어디서 접근할 지에 따라서 권한을 다르게 주어야 하는 경우가 있기 때문에 `@'<host>'`에서의 "**'<host>'**" 부분에는 접속 요청이 온 localhost를 명시해서 해당 IP에서만 접근이 가능하게 하거나 어디서라도 접근할 수 있는 `%`를 적어줘서 설정할 수 있다.
            
