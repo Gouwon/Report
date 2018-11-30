@@ -7,11 +7,11 @@
       docker search ubuntu
       docker image pull ubuntu
       docker image ls
-      docker container run -itd --restart=always --name <container-name>[^1] ubuntu bash
+      docker container run -itd --restart=always --name <container-name><sub>[^1]</sub> ubuntu bash
       docker container ps
      
      ```
-     [^1]: 임의로 컨테이너 이름은 `ubt`라 한다.
+     <sub>[^1]: 임의로 컨테이너 이름은 `ubt`라 한다.</sub>
      
      
   2. 설치된 Ubuntu Container에 Telnet daemon 구동 및 한글 사용 설정하기
@@ -24,7 +24,7 @@
       apt-get install locales
       localedef -f UTF-8 -i ko_KR ko_KR.UTF-8
       locale -gen ko.KR.UTF-8
-      vi /bin/docker_bash[^2]
+      vi /bin/docker_bash<sub>[^2]</sub>
           #!bin/sh
           /etc/init.d/xinetd restart
           export LANGUAGE=ko
@@ -35,7 +35,7 @@
       docker attach ubx
      
      ```
-     [^2]: 새로운 컨테이너, 이미지의 이름은 임의로 `ubx`라 한다.
+     <sub>[^2]: 새로운 컨테이너, 이미지의 이름은 임의로 `ubx`라 한다.</sub>
      
      
      ## 오라클 Virtualbox 포트 포워딩 설정 추가
@@ -57,7 +57,7 @@
         git config --list
         git config --global user.name <github-username>
         git config --global user.email <email>
-        git config credential.helper store[^3]
+        git config credential.helper store<sub>[^3]</sub>
         git clone <github-url>
         git add --all
         git commit -am "<message>
@@ -65,4 +65,4 @@
      
       ```      
       
-      [^3]: Git 로그인 게정과 비밀번호 입력값 기억.
+      <sub>[^3]: Git 로그인 게정과 비밀번호 입력값 기억.</sub>
