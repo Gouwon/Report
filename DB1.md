@@ -1,4 +1,4 @@
- # 문제 1) Docker를 활용하여 오라클 Express Edition을 설치하는 과정을 기술하시오.
+ # Docker를 활용하여 오라클 Express Edition을 설치하는 과정을 기술하시오.
  ***
  
   도커는 이미지를 기반으로 컨테이너를 구동하기 때문에, 일반적으로 https://hub.docker.com에 등록된 이미지들을 받아서 설치한다.
