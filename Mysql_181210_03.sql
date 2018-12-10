@@ -52,3 +52,5 @@ update ClubMember
 set level = (case when rand() < 0.5 then 0 else 1 end) where level = 0;
 
 select * from ClubMember;
+
+commit;
