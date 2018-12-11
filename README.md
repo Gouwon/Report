@@ -1,6 +1,6 @@
 # Report
 
-#### DB 구축 관련 Docker, Oracle, Mysql의 개념 및 설치에 대하여 정리한 문서 목록들입니다.
+#### DB 구축 관련 Mysql의 SQL문을 이용한 데이터 정리 방법을  문서 목록들입니다.
 
   + [Docker를 활용하여 오라클 Express Edition을 설치하는 과정을 기술하시오.](https://github.com/Gouwon/Report/blob/master/DB1.md) 
  
