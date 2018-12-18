@@ -1,4 +1,23 @@
 -- 6번문제) 과목별 Top3 학생의 이름과 성적을 한줄로 표현하는 리포트를 아래와 같이 작성하시오.(성적은 중간, 기말 평균이며, 과목명 오름차순으로 정렬하시오.)
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `dooo`@`%` 
+    SQL SECURITY DEFINER
+VIEW `v_grade_enroll` AS
+    SELECT 
+        `g`.`id` AS `id`,
+        `g`.`midterm` AS `midterm`,
+        `g`.`finalterm` AS `finalterm`,
+        (`g`.`midterm` + `g`.`finalterm`) AS `total`,
+        FLOOR(((`g`.`midterm` + `g`.`finalterm`) / 2)) AS `avr`,
+        `g`.`enroll` AS `enroll`,
+        `e`.`subject` AS `subject`,
+        `e`.`student` AS `student`
+    FROM
+        (`Grade` `g`
+        JOIN `Enroll` `e` ON ((`g`.`enroll` = `e`.`id`)));
+
+
 
 drop procedure if exists sp_subject_ranking;
 
