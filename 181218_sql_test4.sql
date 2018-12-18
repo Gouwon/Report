@@ -4,10 +4,10 @@
 select sbj.id as sbj_id, max(sbj.name) as sbj_name, max(pr.name) as prof_name, 
        count(*) as stu_cnt, avg((g.midterm + g.finalterm) / 2) as avg_score, 
        avg(pr.likecnt) prof_likecnt
-	from Enroll e inner join Subject sbj on sbj.id = e.subject
-				  inner join Prof pr on pr.id = sbj.prof
+    from Enroll e inner join Subject sbj on sbj.id = e.subject
+       	          inner join Prof pr on pr.id = sbj.prof
                   inner join Grade g on e.id = g.enroll
-	group by sbj.id
+    group by sbj.id
     order by count(*) desc, avg((g.midterm + g.finalterm) / 2) desc, avg(pr.likecnt) desc
 ;
 
@@ -20,10 +20,10 @@ select sbj.id as sbj_id, max(sbj.name) as sbj_name, max(pr.name) as prof_name,
        ( (count(*)/(select count(distinct ee.student) from Enroll ee) * 0.15) + 
          (avg((g.midterm + g.finalterm) / 2) * 0.4) +
 		(avg(pr.likecnt) * 0.45)) estimation
-	from Enroll e inner join Subject sbj on sbj.id = e.subject
-				  inner join Prof pr on pr.id = sbj.prof
+    from Enroll e inner join Subject sbj on sbj.id = e.subject
+                  inner join Prof pr on pr.id = sbj.prof
                   inner join Grade g on e.id = g.enroll
-	group by sbj.id
+    group by sbj.id
     order by estimation desc
 ;
 
@@ -31,18 +31,17 @@ select sbj.id as sbj_id, max(sbj.name) as sbj_name, max(pr.name) as prof_name,
 delimiter //
 create procedure sp_popular_prof()
         begin
-			select sbj.id as sbj_id, max(sbj.name) as sbj_name, max(pr.name) as prof_name, 
-				   (count(*)) as stu_cnt, (avg((g.midterm + g.finalterm) / 2)) as avg_score, 
-				   (avg(pr.likecnt))  prof_likecnt,
-				   ( (count(*)/(select count(distinct ee.student) from Enroll ee) * 1.5) + 
-					 (avg((g.midterm + g.finalterm) / 200) * 0.4) +
-					(avg(pr.likecnt) * 0.45)) estimation
-				from Enroll e inner join Subject sbj on sbj.id = e.subject
-							  inner join Prof pr on pr.id = sbj.prof
-							  inner join Grade g on e.id = g.enroll
-				group by sbj.id
-				order by estimation desc limit 3;
-            
+	select sbj.id as sbj_id, max(sbj.name) as sbj_name, max(pr.name) as prof_name, 
+	       (count(*)) as stu_cnt, (avg((g.midterm + g.finalterm) / 2)) as avg_score, 
+	       (avg(pr.likecnt))  prof_likecnt,
+	       ( (count(*)/(select count(distinct ee.student) from Enroll ee) * 1.5) + 
+		 (avg((g.midterm + g.finalterm) / 200) * 0.4) +
+	         (avg(pr.likecnt) * 0.45)) estimation		
+            from Enroll e inner join Subject sbj on sbj.id = e.subject
+			  inner join Prof pr on pr.id = sbj.prof
+			  inner join Grade g on e.id = g.enroll
+		group by sbj.id
+		order by estimation desc limit 3;
         end //
 delimiter ;
 
