@@ -15,7 +15,7 @@ select *
         
 
 select round(avg(ee.salary), -1) salary
-                  from Employees ee
-                  where ee.department_id = 80
-                  group by ee.department_id;
+   from Employees ee
+   where ee.department_id = 80
+   group by ee.department_id;
 
