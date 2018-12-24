@@ -52,7 +52,7 @@ desc Department;
 select * from Employee;
 desc Employee;
 select * from JobHistory;
-desc Jobhistory;
+desc JobHistory;
 
 
 
