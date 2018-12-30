@@ -35,8 +35,6 @@ def get_count1(conn, tbl, columns, where = ''):
     cur.execute(sql)
     return cur.fetchone()[0]
 
-
-
 def trunc_table(conn, tbl):
     cur = conn.cursor()
     cur.execute('truncate table ' + tbl)
@@ -58,7 +56,7 @@ def get_sample_verify(conn, tbl, smpls):
         rows.append(cur.fetchone()) 
     return rows
         
-def get_sample_verify1(conn, tbl, columns, smpls, condition1, condition2):
+def get_sample_verify1(conn, tbl, columns, condition1, condition2):
     cur = conn.cursor()
     rows = []
     if tbl == "JOBS":
@@ -77,7 +75,7 @@ def get_sample_verify1(conn, tbl, columns, smpls, condition1, condition2):
     rows.append(cur.fetchone()) 
     return rows
 
-def set_data(cur_mysql, target_table_name):
+def set_data(db, target_table_name):
 
     target_to_source ={"Job" : "JOBS", "Department" : "DEPARTMENTS", "Employee" : "EMPLOYEES", "JobHistory": "JOB_HISTORY"}
 
@@ -94,22 +92,29 @@ def set_data(cur_mysql, target_table_name):
     with conn_oracle:
         cursor = conn_oracle.cursor()
         sql = 'select ' + source_tables[target_to_source[target_table_name]] + ' from ' + target_to_source[target_table_name]
+        print("Oracle SQL : ", sql)
         cursor.execute(sql)
         rows = cursor.fetchall()
 
-    if target_table_name == "Job":
-        sql_insert = "insert into " + target_table_name + "(" + ") values(%s, %s, %s, %s)"
-    elif target_table_name == "Department":
-        sql_insert = "insert into " + target_table_name + "(" + ") values(%s, %s, %s)"
-    elif target_table_name == "Employee":
-        sql_insert = "insert into " + target_table_name + "(" + ") values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    else:
-        sql_insert = "insert into " + target_table_name + "(" + ") values(%s, %s, %s, %s, %s)"
-       
-    cur_mysql.executemany(sql_insert, rows)
+    conn_mysql = connect_mysql(db)
+    with conn_mysql:
+        cur_mysql = conn_mysql.cursor()
+
+        if target_table_name == "Job":
+            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s, %s)"
+        elif target_table_name == "Department":
+            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s)"
+        elif target_table_name == "Employee":
+            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        else:
+            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s, %s, %s)"
+        
+        print("MySQL  SQL : ", sql_insert)
+        cur_mysql.executemany(sql_insert, rows)
+    print("====================================================================== END " + target_table_name)
 
 
-def create_table(target_table_name):
+def create_table(db, target_table_name):
     target_tables ={"Job" : '''id varchar(45) not null,
                          title varchar(45) not null,
                          min_salary int default 0,
@@ -126,7 +131,7 @@ def create_table(target_table_name):
                                 tel varchar(45),
                                 hire_date datetime not null,
                                 job varchar(45) not null,
-                                salary int default 0,
+                                salary float(10,2) default 0,
                                 commission_pct float(4,2) default 0,
                                 manager_id int default 0,
                                 department int default 0,
@@ -138,7 +143,7 @@ def create_table(target_table_name):
                                   department int default 0,
                                   primary key(employee, start_date)'''}
     
-    conn_mysql = connect_mysql("dooodb")
+    conn_mysql = connect_mysql(db)
 
     with conn_mysql:
         cur_mysql = conn_mysql.cursor()
@@ -149,4 +154,5 @@ def create_table(target_table_name):
         cur_mysql.execute(sql_drop)
         sql_create = 'create table ' + target_table_name + ' (' + target_tables[target_table_name] + ')'
         cur_mysql.execute(sql_create)
+        print("create table {} complete! \n".format(target_table_name))
 
