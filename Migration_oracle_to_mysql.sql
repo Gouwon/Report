@@ -2,15 +2,13 @@ import migration_oracle_to_mysql_util_0001 as mu
 
 target_to_source ={"Job" : "JOBS", "Department" : "DEPARTMENTS", "Employee" : "EMPLOYEES", "JobHistory": "JOB_HISTORY"}
 
-conn_mysql = mu.connect_mysql("dooodb")
+for target_table_name in target_to_source:
+    mu.create_table("dooodb", target_table_name)
+    mu.set_data("dooodb", target_table_name)
 
+conn_mysql = mu.connect_mysql("dooodb")
 with conn_mysql:
     cur_mysql = conn_mysql.cursor()
-
-    for target_table_name in target_to_source:
-        mu.create_table(target_table_name)
-        mu.set_data(cur_mysql, target_table_name)
-
 
     cur_mysql.execute('''alter table Employee
                         add constraint uq_email unique (email)''')
