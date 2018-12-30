@@ -32,12 +32,12 @@ with conn_mysql:
             else:
                 print("Count is OK")
                 for i, j in enumerate(mysql_smpls):
-                    oracle_smpls = mu.get_sample_verify1(conn_oracle, target_to_source[target_to_source_name], source_tables[target_to_source[target_to_source_name]], mysql_smpls, mysql_smpls[i][0], mysql_smpls[i][1] )
-                    print("mysql_smpls >>>>>>>>>>>>>>>>>>>>",mysql_smpls)
-                    print("====================================================================================")
-                    print("oracle_smpls <<<<<<<<<<<<<<<<<<<",oracle_smpls)
-                    if mysql_smpls[i][0:] == oracle_smpls[0][0:]:
-                        print("OOOOOKKKKK")
+                    oracle_smpls = mu.get_sample_verify1(conn_oracle, target_to_source[target_to_source_name], source_tables[target_to_source[target_to_source_name]], j[0], j[1] )
+                    print("mysql_smpls >>>>>>>>>>>>>>>>>>>>",j)
+                    print("<<<<<<<<<<<<<<<<<<< oracle_smpls",oracle_smpls[0])
+                    if j[0:] == oracle_smpls[0][0:]:
+                        print("SQL {:d} of {} : OOOOOKKKKK".format(i + 1, target_to_source_name))
+                        print("==========================================================================================================================================")
                     else:
                         print("NOT MATCHED!!!!!")
                         break
