@@ -14,38 +14,54 @@ def connect_oracle():
     return cx_Oracle.connect("hr", "hrpw", "localhost:1521/xe")
 
     
-def get_count(conn, tbl, where = ''):
-    cur = conn.cursor()
-    sql = "select count(*) from " + tbl
-    if where != '':
-        sql = sql + " where " + where
+def get_count(dbms, tbl, where = ''):
+    if dbms == "mysql":
+        conn = connect_mysql("dooodb")
+        print("Connecting to MySQL .........")
+    elif dbms == "oracle":
+        conn = connect_oracle()
+        print("Connecting to Oracle .........")
+    else:
+        print("Wrong DBMS! Please Check again")
+        exit()
+    with conn:
+        cur = conn.cursor()
+        sql = "select count(*) from " + tbl
+        if where != '':
+            sql = sql + " where " + where
+        print("SQL from {} : {}\n".format(dbms, sql))
+        cur.execute(sql)
+        return cur.fetchone()[0]
 
-    # print("get_count.sql=", sql)
-    cur.execute(sql)
-    return cur.fetchone()[0]
 
-def get_count1(conn, tbl, columns, where = ''):
-    cur = conn.cursor()
-    sql = "select " + columns + " from " + tbl
-    if where != '':
-        sql = sql + " where " + where
-
-    # print("get_count.sql=", sql)
-    print("@@@@@@@@@@@@@@@@@@@@@", sql)
-    cur.execute(sql)
-    return cur.fetchone()[0]
 
 def trunc_table(conn, tbl):
     cur = conn.cursor()
     cur.execute('truncate table ' + tbl)
     return cur.rowcount
 
-def get_sample(conn, tbl, n):
-    cur = conn.cursor()
-    sql = "select * from " + tbl + " order by rand() limit " + n
-    cur.execute(sql)
-    rows = cur.fetchall()
-    return rows
+def get_sample(dbms, tbl, n):
+    target_tables ={"Job" : "id, title, min_salary, max_salary",
+                    "Department" : "id, name, manager_id",
+                    "Employee" : "id, first_name, last_name, email, tel, hire_date, job, salary, commission_pct, manager_id, department",
+                    "JobHistory" : "employee, start_date, end_date, job, department"}
+
+    if dbms == "mysql":
+        conn = connect_mysql("dooodb")
+        print("Connecting to MySQL .........")
+    elif dbms == "oracle":
+        conn = connect_oracle()
+        print("Connecting to Oracle .........")
+    else:
+        print("Wrong DBMS! Please Check again")
+        exit()
+    with conn:
+        cur = conn.cursor()
+        sql = "select " + target_tables[tbl] +" from " + tbl + " order by rand() limit " + n
+        cur.execute(sql)
+        rows = cur.fetchall()
+        print("Getting Sample Data from {}".format(dbms))
+        return rows
 
 def get_sample_verify(conn, tbl, smpls):
     cur = conn.cursor()
@@ -56,8 +72,12 @@ def get_sample_verify(conn, tbl, smpls):
         rows.append(cur.fetchone()) 
     return rows
         
-def get_sample_verify1(conn, tbl, columns, condition1, condition2):
-    cur = conn.cursor()
+def get_sample_to_verify(tbl, condition1, condition2):    
+    source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
+                    "DEPARTMENTS" : "DEPARTMENT_ID, DEPARTMENT_NAME, MANAGER_ID", 
+                    "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
+                    "JOB_HISTORY" : "EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID"}
+
     rows = []
     if tbl == "JOBS":
         where = "where job_id = " + "'" + condition1 + "'"
@@ -69,10 +89,14 @@ def get_sample_verify1(conn, tbl, columns, condition1, condition2):
         condition2
         where = "where employee_id = " + "'" + str(condition1) + "'" + " and start_date =  to_date(" + "'" +  str(condition2) + "', 'YY/MM/DD HH24:MI:SS')"
 
+    columns = source_tables[tbl]    
     sql = 'select ' + columns + ' from ' + tbl + ' ' + where
-    print(sql)
-    cur.execute(sql)
-    rows.append(cur.fetchone()) 
+    print("from Oracle : \n{} \n".format(sql))
+    conn = connect_oracle()
+    with conn:
+        cur = conn.cursor()
+        cur.execute(sql)
+        rows.append(cur.fetchone()) 
     return rows
 
 def set_data(db, target_table_name):
@@ -83,7 +107,7 @@ def set_data(db, target_table_name):
                 "DEPARTMENTS" : "DEPARTMENT_ID, DEPARTMENT_NAME, MANAGER_ID", 
                 "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
                 "JOB_HISTORY" : "EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID"}
-    target_table ={"Job" : "id, title, min_salary, max_salary",
+    target_tables ={"Job" : "id, title, min_salary, max_salary",
                    "Department" : "id, name, manager_id",
                    "Employee" : "id, first_name, last_name, email, tel, hire_date, job, salary, commission_pct, manager_id, department",
                    "JobHistory" : "employee, start_date, end_date, job, department"}
@@ -101,13 +125,13 @@ def set_data(db, target_table_name):
         cur_mysql = conn_mysql.cursor()
 
         if target_table_name == "Job":
-            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s, %s)"
+            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s)"
         elif target_table_name == "Department":
-            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s)"
+            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s)"
         elif target_table_name == "Employee":
-            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         else:
-            sql_insert = "insert into " + target_table_name + "(" + target_table[target_table_name] + ") values(%s, %s, %s, %s, %s)"
+            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s, %s)"
         
         print("MySQL  SQL : ", sql_insert)
         cur_mysql.executemany(sql_insert, rows)
