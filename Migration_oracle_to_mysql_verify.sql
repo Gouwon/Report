@@ -21,6 +21,6 @@ for target_to_source_name in target_to_source:
                 print("\nSQL {:d} of {} : OOOOOKKKKK\n".format(i + 1, target_to_source_name))
                 print("==========================================================================================================================================")
             else:
-                print("\nSQL {:d} of {} : NOT MATCHED!!!!!")
+                print("\nSQL {:d} of {} : NOT MATCHED!!!!!".format(i + 1, target_to_source_name))
                 exit()
         
