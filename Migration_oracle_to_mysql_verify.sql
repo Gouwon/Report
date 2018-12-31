@@ -4,7 +4,8 @@ target_to_source ={"Job" : "JOBS", "Department" : "DEPARTMENTS", "Employee" : "E
 
 for target_to_source_name in target_to_source:
     mysql_cnt = mu.get_count("mysql", target_to_source_name)
-    mysql_smpls = mu.get_sample("mysql", target_to_source_name, "5")
+    sampling = round(mysql_cnt / 3)
+    mysql_smpls = mu.get_sample("mysql", target_to_source_name, sampling)
     oracle_cnt = mu.get_count("oracle", target_to_source[target_to_source_name])
 
     if oracle_cnt != mysql_cnt:
@@ -20,6 +21,6 @@ for target_to_source_name in target_to_source:
                 print("\nSQL {:d} of {} : OOOOOKKKKK\n".format(i + 1, target_to_source_name))
                 print("==========================================================================================================================================")
             else:
-                print("NOT MATCHED!!!!!")
-                break
+                print("\nSQL {:d} of {} : NOT MATCHED!!!!!")
+                exit()
         
