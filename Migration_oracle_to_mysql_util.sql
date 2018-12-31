@@ -33,13 +33,6 @@ def get_count(dbms, tbl, where = ''):
         cur.execute(sql)
         return cur.fetchone()[0]
 
-
-
-def trunc_table(conn, tbl):
-    cur = conn.cursor()
-    cur.execute('truncate table ' + tbl)
-    return cur.rowcount
-
 def get_sample(dbms, tbl, n):
     target_tables ={"Job" : "id, title, min_salary, max_salary",
                     "Department" : "id, name, manager_id",
@@ -60,8 +53,8 @@ def get_sample(dbms, tbl, n):
         sql = "select " + target_tables[tbl] +" from " + tbl + " order by rand() limit " + str(n)
         cur.execute(sql)
         rows = cur.fetchall()
-        print("Getting Sample Data from {}".format(dbms))
-        return rows
+    print("Getting Sample Data from {}".format(dbms))
+    return rows
         
 def get_sample_to_verify(tbl, condition1, condition2):    
     source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
@@ -90,9 +83,7 @@ def get_sample_to_verify(tbl, condition1, condition2):
     return rows
 
 def set_data(db, target_table_name):
-
     target_to_source ={"Job" : "JOBS", "Department" : "DEPARTMENTS", "Employee" : "EMPLOYEES", "JobHistory": "JOB_HISTORY"}
-
     source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
                 "DEPARTMENTS" : "DEPARTMENT_ID, DEPARTMENT_NAME, MANAGER_ID", 
                 "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
@@ -159,7 +150,6 @@ def create_table(db, target_table_name):
                                   primary key(employee, start_date)'''}
     
     conn_mysql = connect_mysql(db)
-
     with conn_mysql:
         cur_mysql = conn_mysql.cursor()
 
@@ -169,5 +159,5 @@ def create_table(db, target_table_name):
         cur_mysql.execute(sql_drop)
         sql_create = 'create table ' + target_table_name + ' (' + target_tables[target_table_name] + ')'
         cur_mysql.execute(sql_create)
-        print("create table {} complete! \n".format(target_table_name))
-
+    
+    print("create table {} complete! \n".format(target_table_name))
