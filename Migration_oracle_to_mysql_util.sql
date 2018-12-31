@@ -57,20 +57,11 @@ def get_sample(dbms, tbl, n):
         exit()
     with conn:
         cur = conn.cursor()
-        sql = "select " + target_tables[tbl] +" from " + tbl + " order by rand() limit " + n
+        sql = "select " + target_tables[tbl] +" from " + tbl + " order by rand() limit " + str(n)
         cur.execute(sql)
         rows = cur.fetchall()
         print("Getting Sample Data from {}".format(dbms))
         return rows
-
-def get_sample_verify(conn, tbl, smpls):
-    cur = conn.cursor()
-    rows = []
-    for smpl in smpls:
-        sql = "select * from " + tbl + " where id = %s"
-        cur.execute(sql, smpl[0])
-        rows.append(cur.fetchone()) 
-    return rows
         
 def get_sample_to_verify(tbl, condition1, condition2):    
     source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
@@ -80,13 +71,12 @@ def get_sample_to_verify(tbl, condition1, condition2):
 
     rows = []
     if tbl == "JOBS":
-        where = "where job_id = " + "'" + condition1 + "'"
+        where = "where job_id = " + "'" + str(condition1) + "'"
     elif tbl == "DEPARTMENTS":
         where = "where department_id = " + str(condition1)
     elif tbl == "EMPLOYEES":
         where = "where employee_id = " + "'" + str(condition1) + "'"
     else:
-        condition2
         where = "where employee_id = " + "'" + str(condition1) + "'" + " and start_date =  to_date(" + "'" +  str(condition2) + "', 'YY/MM/DD HH24:MI:SS')"
 
     columns = source_tables[tbl]    
@@ -135,6 +125,7 @@ def set_data(db, target_table_name):
         
         print("MySQL  SQL : ", sql_insert)
         cur_mysql.executemany(sql_insert, rows)
+        print("AffectedRowCount is ", cur_mysql.rowcount)
     print("====================================================================== END " + target_table_name)
 
 
