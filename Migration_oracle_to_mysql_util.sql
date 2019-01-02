@@ -33,33 +33,48 @@ def get_count(dbms, tbl, where = ''):
         cur.execute(sql)
         return cur.fetchone()[0]
 
-def get_sample(dbms, tbl, n):
+def get_sample(dbms, tbl, n = ''):
     target_tables ={"Job" : "id, title, min_salary, max_salary",
                     "Department" : "id, name, manager_id",
                     "Employee" : "id, first_name, last_name, email, tel, hire_date, job, salary, commission_pct, manager_id, department",
                     "JobHistory" : "employee, start_date, end_date, job, department"}
+    source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
+                "DEPARTMENTS" : "DEPARTMENT_ID, DEPARTMENT_NAME, MANAGER_ID", 
+                "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
+                "JOB_HISTORY" : "EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID"}
+
+    ## case when pct is null then null, else round(4,2)
 
     if dbms == "mysql":
         conn = connect_mysql("dooodb")
         print("Connecting to MySQL .........")
+        if n != '':
+            sql = "select " + target_tables[tbl] +" from " + tbl + " order by rand() limit " + str(n)
+        else:
+            sql = "select " + target_tables[tbl] +" from " + tbl
     elif dbms == "oracle":
         conn = connect_oracle()
         print("Connecting to Oracle .........")
+        if n != '':
+            sql = "select " + source_tables[tbl] +" from " + tbl + " order by rand() limit " + str(n)
+        else:
+            sql = "select " + source_tables[tbl] +" from " + tbl
     else:
         print("Wrong DBMS! Please Check again")
         exit()
+    
     with conn:
         cur = conn.cursor()
-        sql = "select " + target_tables[tbl] +" from " + tbl + " order by rand() limit " + str(n)
         cur.execute(sql)
         rows = cur.fetchall()
     print("Getting Sample Data from {}".format(dbms))
+    print(dbms, " SQL : ", sql)
     return rows
         
 def get_sample_to_verify(tbl, condition1, condition2):    
     source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
                     "DEPARTMENTS" : "DEPARTMENT_ID, DEPARTMENT_NAME, MANAGER_ID", 
-                    "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
+                    "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, (case when COMMISSION_PCT is null then null, else round(COMMISSION_PCT, 2) end) COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
                     "JOB_HISTORY" : "EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID"}
 
     rows = []
@@ -84,37 +99,27 @@ def get_sample_to_verify(tbl, condition1, condition2):
 
 def set_data(db, target_table_name):
     target_to_source ={"Job" : "JOBS", "Department" : "DEPARTMENTS", "Employee" : "EMPLOYEES", "JobHistory": "JOB_HISTORY"}
-    source_tables ={"JOBS" : "JOB_ID, JOB_TITLE, MIN_SALARY, MAX_SALARY", 
-                "DEPARTMENTS" : "DEPARTMENT_ID, DEPARTMENT_NAME, MANAGER_ID", 
-                "EMPLOYEES" : "EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID", 
-                "JOB_HISTORY" : "EMPLOYEE_ID, START_DATE, END_DATE, JOB_ID, DEPARTMENT_ID"}
     target_tables ={"Job" : "id, title, min_salary, max_salary",
                    "Department" : "id, name, manager_id",
                    "Employee" : "id, first_name, last_name, email, tel, hire_date, job, salary, commission_pct, manager_id, department",
                    "JobHistory" : "employee, start_date, end_date, job, department"}
 
-    conn_oracle = connect_oracle()
-    with conn_oracle:
-        cursor = conn_oracle.cursor()
-        sql = 'select ' + source_tables[target_to_source[target_table_name]] + ' from ' + target_to_source[target_table_name]
-        print("Oracle SQL : ", sql)
-        cursor.execute(sql)
-        rows = cursor.fetchall()
+    rows = get_sample("oracle", target_to_source[target_table_name])
+
+    if target_table_name == "Job":
+        sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s)"
+    elif target_table_name == "Department":
+        sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s)"
+    elif target_table_name == "Employee":
+        sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    else:
+        sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s, %s)"
+    
+    print("MySQL  SQL : ", sql_insert)
 
     conn_mysql = connect_mysql(db)
     with conn_mysql:
         cur_mysql = conn_mysql.cursor()
-
-        if target_table_name == "Job":
-            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s)"
-        elif target_table_name == "Department":
-            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s)"
-        elif target_table_name == "Employee":
-            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        else:
-            sql_insert = "insert into " + target_table_name + "(" + target_tables[target_table_name] + ") values(%s, %s, %s, %s, %s)"
-        
-        print("MySQL  SQL : ", sql_insert)
         cur_mysql.executemany(sql_insert, rows)
         print("AffectedRowCount is ", cur_mysql.rowcount)
     print("====================================================================== END " + target_table_name)
@@ -148,16 +153,16 @@ def create_table(db, target_table_name):
                                   job varchar(45) not null,
                                   department int default 0,
                                   primary key(employee, start_date)'''}
-    
+
+    sql_sp = "call sp_drop_fk_refs(" + '"' + target_table_name + '"' + ")"
+    sql_drop = "drop table if exists " + target_table_name
+    sql_create = 'create table ' + target_table_name + ' (' + target_tables[target_table_name] + ')'
+
     conn_mysql = connect_mysql(db)
     with conn_mysql:
         cur_mysql = conn_mysql.cursor()
-
-        sql_sp = "call sp_drop_fk_refs(" + '"' + target_table_name + '"' + ")"
         cur_mysql.execute(sql_sp)
-        sql_drop = "drop table if exists " + target_table_name
         cur_mysql.execute(sql_drop)
-        sql_create = 'create table ' + target_table_name + ' (' + target_tables[target_table_name] + ')'
         cur_mysql.execute(sql_create)
     
     print("create table {} complete! \n".format(target_table_name))
