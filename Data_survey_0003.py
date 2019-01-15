@@ -159,6 +159,8 @@ def get_detailed_apartment_information(dong_name, APT_NAME, APT_CODE, session_cn
     session_cnt += sseion_cnt_in_function
     return (session_cnt, session)
 
+
+
 if __name__ == "__main__":
     import requests
 
