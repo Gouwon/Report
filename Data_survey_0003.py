@@ -16,7 +16,7 @@ def open_captcha():
         exit()
 
     driver.get("http://rt.molit.go.kr/new/pop/captcha_Popup.do")
-    userinput = input("<<<<<<<<<<<<<<<<<<<<< ===================")
+    userinput = input("Captcha 처리 후 Enter를 쳐주세요...........")
     driver.close()
 
 
@@ -45,6 +45,8 @@ def get_dong_code():
         print("기초 동을 가지고 오는 중입니다..........................", dong_name["NAME"])
     
     return simplified_dong_code_list
+
+
 
 def get_apartment_code(dongCode):
     import requests
@@ -75,6 +77,7 @@ def get_apartment_code(dongCode):
         print("아파트 이름을 가지고 오는 중입니다..........................", apt_name["APT_NAME"])
 
     return simplified_apt_code_list
+
 
 
 def get_detailed_apartment_information(dong_name, APT_NAME, APT_CODE, session_cnt, session):
