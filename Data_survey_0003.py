@@ -114,10 +114,9 @@ def get_detailed_apartment_information(dong_name, APT_NAME, APT_CODE, session_cn
         detailed_information_list = jsonData["result"]
     except:
         open_captcha()
-
-    html = session.get(url, params=params, headers=headers)
-    jsonData = json.loads(html.text)
-    detailed_information_list = jsonData["result"]        
+        html = session.get(url, params=params, headers=headers)
+        jsonData = json.loads(html.text)
+        detailed_information_list = jsonData["result"]        
 
     print("Keep-Alive >>>>>>>>>>>>", html.headers['Keep-Alive'])
     # print("", html.headers['Set-Cookie'])
