@@ -1,6 +1,7 @@
 #todo!!! 캡챠 관련 자동으로 해결하기...
 
 
+
 headers = { "Referer": "http://rt.molit.go.kr/new/gis/srh.do?menuGubun=A&gubunCode=LAND",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"}
 
@@ -109,6 +110,7 @@ def get_detailed_apartment_information(dong_name, APT_NAME, APT_CODE, session_cn
 
     html = session.get(url, params=params, headers=headers)
     jsonData = json.loads(html.text)
+    
     try:
         detailed_information_list = jsonData["result"]
     except:
