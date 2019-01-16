@@ -36,10 +36,12 @@ def get_music_ranking():
         info_list = music.select('div.ellipsis')
         sort = { 0 : "노래명", 1 : "음악가", 2 : "앨범명" }
 
-        artists = []
-        for artist in info_list[1].select('span.checkEllipsis a'):
-            artist_name = artist.text.strip()
-            artists.append(artist_name)
+
+        artists = [artist_name.text.strip() for artist_name in info_list[1].select('span.checkEllipsis a')]
+        # artists = []
+        # for artist in info_list[1].select('span.checkEllipsis a'):
+        #     artist_name = artist.text.strip()
+        #     artists.append(artist_name)
 
         result[contsid] = { "순  위" : ranking,
                             "노래명" : info_list[0].select_one('a').text.strip(),
