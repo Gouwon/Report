@@ -1,5 +1,6 @@
 #todo!!! 캡챠 관련 자동으로 해결하기...
 
+
 headers = { "Referer": "http://rt.molit.go.kr/new/gis/srh.do?menuGubun=A&gubunCode=LAND",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"}
 
@@ -84,7 +85,6 @@ def get_apartment_code(dongCode):
 def get_detailed_apartment_information(dong_name, APT_NAME, APT_CODE, session_cnt, session):
     import requests
     import json
-    import urls
 
     url = "http://rt.molit.go.kr/new/gis/getDanjiInfoDetail.do"  #GET
 
@@ -94,7 +94,6 @@ def get_detailed_apartment_information(dong_name, APT_NAME, APT_CODE, session_cn
             'p_acc_year':'2018',
             'areaCode':'',
             'priceCode':''}
-    print(params)
 
     if session_cnt >= 90:
         print("\n서버로부터 새로운 SESSION ID를 할당받아 사용합니다.")
