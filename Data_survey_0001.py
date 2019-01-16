@@ -27,27 +27,26 @@ def get_music_ranking():
         prcs_cnt += 1
         contsid = music.get('data-song-no')
         result[contsid] = []
-        # print("================================================================================\n")
-        # print(">>>>>>>>>>>>>> contsid : ", contsid)
+
         if prcs_cnt <= 50:
             rank = music.select_one('#lst50 > td:nth-child(2) > div > span.rank').text
         else:
             rank = music.select_one('#lst100 > td:nth-child(2) > div > span.rank').text
         ranking = lst_rank[prcs_cnt].text
         info_list = music.select('div.ellipsis')
-        # print(">>>>>>>>>>>>>> lst_rank[" + str(prcs_cnt) + "] 순  위: ", ranking)
-        # print("============ len(info_list) : ", len(info_list))
         sort = { 0 : "노래명", 1 : "음악가", 2 : "앨범명" }
-        # for i in range(0, len(info_list)):
-            # print(">>>>>>>>>>>>>> info_list[" + str(i) + "] " + sort[i] + ": ", info_list[i].select_one('a').text.strip())
+
+        artists = []
+        for artist in info_list[1].select('span.checkEllipsis a'):
+            artist_name = artist.text.strip()
+            artists.append(artist_name)
 
         result[contsid] = { "순  위" : ranking,
                             "노래명" : info_list[0].select_one('a').text.strip(),
-                            "음악가" : info_list[1].select_one('a').text.strip(),
+                            "음악가" : ",".join(artists),
                             "앨범명" : info_list[2].select_one('a').text.strip(),
                             "좋아요" : "" }
 
-        # print("")
     return result
 
 def get_music_like_cnt_list(contsid_list):
@@ -73,6 +72,8 @@ def get_music_like_cnt_list(contsid_list):
 
 
 if __name__ == "__main__":
+    from pprint import pprint
+
     music_info_list = get_music_ranking()
 
     contsid_list = []
@@ -84,4 +85,4 @@ if __name__ == "__main__":
         music_info_list[str(contsid)]['좋아요'] = music_like_cnt_list[contsid]
 
     for contsid in music_info_list:
-        print(music_info_list[contsid])
+        pprint(music_info_list[contsid])
