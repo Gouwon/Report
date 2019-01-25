@@ -2,7 +2,7 @@
 
 #### DB 구축 관련 Docker, Oracle, Mysql의 개념 및 설치에 대하여 정리한 문서 목록들입니다.
 
-  + [ 학번, 학생명, 수강과목수, 전과목 평균점수 칼럼을 갖는 View를 작성하시오.](https://github.com/Gouwon/Report/blob/master/181218_sql_test1.sql
+  + [ep](https://github.com/Gouwon/Report/blob/master/Data_crawling_main.py
 ) 
   
   + [학번을 주면 해당 학생의 전과목 평균을 반환하는 Stored Function을 작성하시오.](https://github.com/Gouwon/Report/blob/master/181218_sql_test2.sql) 
