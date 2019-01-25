@@ -9,4 +9,4 @@
   
   + [데이터 수집 프로그램 모듈 파일](https://github.com/Gouwon/Report/blob/master/Data_crawling_module.py) 
   
-  
+  + [데이터 저장 테이블 작성 쿼리문](https://github.com/Gouwon/Report/blob/master/Data_crawl_DB.sql)  
