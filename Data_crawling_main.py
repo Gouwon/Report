@@ -1,4 +1,4 @@
-import melon_utils as mu 
+import Data_crawling_module as mu 
 import codecs
 import csv
 import datetime
@@ -67,7 +67,7 @@ for numbers in lis:
 print("=============== Song & Album Insert Completed! =================")
 
 ## 마지막으로 SongRank에 노래들의 순위 정보를 csv 파일을 읽어서 저장
-sql2 = 'insert into SongRank(songId, rank, likecnt, rankDate) values(%s, %s, %s, date_format(now(), "%Y%m%''d"))'
+sql2 = 'insert into SongRank(songId, rank, likecnt, rankDate) values(%s, %s, %s, date_format(now(), "%%Y%%m%%d"))'
 # sql2 = 'insert into SongRank(songId, rank, likecnt, rankDate) values(%s, %s, %s, "20190124")'
 csvFile2 = codecs.open(file_location, 'r', 'utf-8')
 reader2 = csv.reader(csvFile2, delimiter=',', quotechar='"')
