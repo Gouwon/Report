@@ -32,11 +32,11 @@ smdt
 # 2016~2019년 연도별 1월(Jan) ~ 12월(Dec) 매출액 데이터를`no year Jan Feb … Dec` 형태로 만든 다음, 아래와 같이 출력하시오.
 
 dfsum = cbind(data.frame(no=1:4, year=2016:2019), 
-               matrix(round(runif(48), 3) * 1000000, nrow=4, 
+               matrix(round(runif(4 * 12), 3) * 1000000, nrow=4, 
                       dimnames = list(NULL, month.abb) ))
 dfsum
 
 library('reshape2')
-meltsum = melt(dfsum[,2:14], id.vars = "year", variable.name = 'month', value.name = "saleamt")
+meltsum = melt(dfsum[,2:ncol(dfsum)], id.vars = "year", variable.name = 'month', value.name = "saleamt")
 head(meltsum)
 
