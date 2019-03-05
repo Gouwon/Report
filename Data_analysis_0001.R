@@ -7,7 +7,7 @@ dim(data[data$group=='A',])
 # fibonacci.R 파일을 작성하고 console에서 실행하시오.
 
 source('fibonacci.R')
-
+# Data_analysis_00011.R 이 fibonacci.R 파일입니다.
 
 # apply를 이용하여 smdt에 과목별 평균점수 행을 추가하고, 총점과 평균 변수(컬럼)을 추가하시오.
 
@@ -39,4 +39,4 @@ dfsum
 library('reshape2')
 meltsum = melt(dfsum[,2:14], id.vars = "year", variable.name = 'month', value.name = "saleamt")
 head(meltsum)
-?melt
+
