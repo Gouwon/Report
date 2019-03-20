@@ -1,0 +1,116 @@
+---
+title: "R_portfolio_0003"
+author: "김건우"
+date: '2019년 4월 19일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+#### R에서의 시각화 Package 중 대표적인 그래프 함수(5개 이상)에 대해 용도와 작도법을 자유롭게 서술하시오.
+
+ R에는 분석한 데이터의 결과 쉽게 이해할 수 있게 여러 가지의 시각화를 지원한다. 기본적으로는 R의 내장 그래프들이 이를 지원한다. 다음과 같은 그래프가 있다.
+
+ - plot (scatter, line)
+ - barplot (bar, area, box, density)
+ - pie
+ - hist
+ - geo, mosaic
+
+그렇지만 이러한 내장 그래프는 사용하기가 어렵고, 그 기능이 제한적이기 때문에 여기서는 ggplot2 package가 제공하는 그래프를 중심으로 설명한다. 이 중 다음의 6개 정도를 예로 든다.
+
+ - geom_point()
+ - geom_line()
+ - geom_boxplot()
+ - geom_histogram()
+ - geom_bar()
+ - geom_density()
+ 
+#####1. geom_point()
+
+```
+library(ggplot2)
+ggplot(data="", aes(x="", y="")) + geom_point()
+
+```
+
+ geom_point() 함수는 내장 그래프인 scatter plot와 마찬가지로 산점도를 그려준다.
+ 흔히 산점도는 2변수 간의 관계 혹은 추세를 보여주는 데 자주 사용되는 그래프이다.
+ 
+ geom_point() 함수의 기본 인자값은 데이터셋과 해당 데이터셋에서 관계를 보고자 하는 2개의 변수값이다. 이 때 2개의 변수값은 aes() 함수를 통해서 처리할 수 있다. 
+ 
+
+#####2. geom_line()
+
+```
+library(ggplot2)
+ggplot(df, aes(x=x, y=y, group=group)) + geom_line(aes(colour = group), linetype = 2)
+
+```
+
+ geom_line() 함수는 내장 그래프인 line plot과 마찬가지로 꺽은선 그래프를 그려준다.
+ 꺽은선 그래프의 경우, 2개의 인자값의 관계 변화를 보여주는 데 많이 사용된다. 보통 꺽은선 그래프가 많이 활용되는 것은 시계열 데이터를 시간의 흐름에 따라 보여줄 때 사용한다.
+ 
+ geom_line() 함수의 기본 인자값은 데이터셋과 해당 데이터셋에서 관계를 보고자 하는 2개의 변수값이다. 이 때 2개의 변수값은 aes() 함수를 통해서 처리할 수 있다. 추가적으로 꺽은선의 형태를 linetype 인자값을 통해서 선택해줄 수 있다. 이외에도 여러가지 옵션을 추가할 수 있다.
+ 
+#####3. geom_boxplot()
+
+```
+library(ggplot2)
+ggplot(mpg, aes(class, hwy))+geom_boxplot(fill = "white", colour = "#3366FF")
+```
+
+ geom_boxplot() 함수는 내장 그래프인 boxplot과 마찬가지로 변수별 값들의 분포를 보여준다. 이는 데이터셋의 값들의 분포를 통해서 시각적으로 기초적인 값들을 체크하고, 개략적으로 데이터를 이해하는 데 많은 도움을 준다.
+ 
+ geom_boxplot() 함수의 기본 인자값은 데이터셋과 구분할 수 있는 factor를 가지고 있는 변수값과 해당 변수값에 따른 볼 value 값을 입력받는다. boxplot은 최저값과 최고값, 중간값 등등 데이터셋의 value 값의 4분위수를 보여준다.
+ 
+#####4. geom_histogram()
+
+```
+library(ggplot2)
+ggplot(diamonds, aes(carat)) +  geom_histogram(binwidth = 0.01)
+ggplot(diamonds, aes(carat)) +  geom_histogram(bins = 200)
+``` 
+
+ geom_histogram() 함수는 내장 그래프인 hist와 마찬가지로 한 개 변수의 도수분포를 시각적으로 보여준다. 이는 변수값의 분포가 어디에 집중이 되었는 지를 쉽게 보여주기 때문에 데이터의 특성을 이해하는 데 좋은 자료가 된다.
+ 
+ geom_histogram() 함수의 기본 인자값은 데이터셋과 도수의 분포를 볼 변수값 하나만을 받는다. 또한 binwidth이나 bins을 통해서 보여줄 히스토그램 막대의 수를 조정할 수 있다.  binwidth는 막대 하나의 크기를 지정함으로써, bins는 보여줄 막대의 수를 지정할 때 사용한다. 
+
+
+#####5. geom_bar()
+
+```
+library(ggplot2)
+ggplot(mpg, aes(manufacturer)) +
+  geom_bar(aes(fill=class),width = 0.5) +
+  theme(axis.text.x = element_text(angle=45, vjust=0.6)) +
+  scale_fill_discrete(name = "class") +
+  labs(title = 'Title', subtitle = 'Sub Title')
+
+```
+
+ geom_bar() 함수는 내장 그래프인 barplot과 마찬가지로 기본적인 막대그래프를 보여준다. 막대그래프는 위의 히스토그램과 달리 도수가 아닌 실제 값의 분포를 보여주기 때문에, 2개의 변수값의 value값을 한 축으로 하여 나타낸다.
+ 
+ geom_bar() 함수의 기본 인자값은 데이터셋과 2개의 변수값이다. 이는 히스토그램이 하나의 변수값에 대해서 도수분포표를 구성하여 그려지는 데 반해, 하나의 변수값만 제공되면 히스토그램과 비슷한 그래프가 그려지고, 2개의 변수값이 제공되면 2개의 변수값에 따른 실제 vaulu값을 막대를 통해서 그린다.
+ 
+#####6. geom_density()
+
+```
+library(ggplot2)
+gplot(mpg, aes(cty)) +
+  geom_density(aes(fill=factor(cyl)), alpha=0.8) +
+  labs(title="밀도그래프", subtitle = "실린더수에 따른 시내연비의 밀도그래프",
+       caption="Source: ggplot2::mpg",
+       x = "도시 연비",
+       fill = "실린더수")
+```
+
+
+ geom_density() 함수는 밀도그래프를 보여준다. 이 그래프는 boxplot으로 그려질 경우 겹쳐지는 값들이나, 히스토그램의 단 하나의 함수값의 분포가 아닌 여러 함수값들이 어디에 집중적으로 분포하고 있는 지를 볼 때 많이 사용한다.
+ 
+  geom_density() 함수의 기본 인자값은 데이터셋과 value값들의 분포를 볼 2개의 데이터값을 받는다.
