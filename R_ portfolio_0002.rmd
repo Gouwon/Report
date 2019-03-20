@@ -1,0 +1,99 @@
+---
+title: "R_portfolio_0002"
+author: "김건우"
+date: '2019년 3월 20일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(tibble) 
+library(ggiraphExtra)
+library(ggiraph)
+library(stringi)
+library(kormaps2014)
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+#### 1번문제) 다음과 같이 미국의 범죄율을 한번에 작도하시오.
+
+```{r}
+usmap = map_data('state') 
+chodata = rownames_to_column(USArrests, var = 'state')
+chodata$state = tolower(chodata$state)
+head(chodata)
+colnames(chodata)
+ggChoropleth(data=chodata,
+             aes(fill=c(Murder,Assault, UrbanPop, Rape), map_id=state),
+             map = usmap,
+             reverse = F,
+             interactive = T)
+```
+
+
+#### 2번문제) 미국 범죄율의 Rape부분을 단계 구분도로 작성하시오.(단, 툴팁은 그림과 같이 표현하고,   클릭시 해당 state의 wikipedia 페이지를 보이도록 HTML로 저장하시오)
+
+```{r}
+chodata[chodata$state=='wisconsin', ]
+tooltips = paste0(
+  sprintf("<p><strong>%s</strong></p>", as.character(chodata$state)),
+  sprintf("<p><strong>%s</strong> / %.0f 만</p>", round(chodata$Rape), round(chodata$UrbanPop) * 10)) 
+
+onclick = paste0('location.href=', sprintf('"http://en.wikipedia.org/wiki/%s"', as.character(chodata$state)))
+
+
+ggplot(chodata, aes(map_id = state)) +
+geom_map_interactive( 
+  aes(fill = Rape,
+      data_id = state,
+      tooltip = tooltips,
+      onclick = onclick), 
+  map = usmap) +
+  expand_limits(x = usmap$long, y = usmap$lat) +
+  scale_fill_gradient2('Rape', high = "blue", mid = "green") +
+  labs(title="USA Rape") -> gg_map
+
+ggiraph(code = print(gg_map))
+girafe(ggobj = gg_map)
+```
+
+
+#### 3번문제) 시도별 결핵환자수(kormaps::tbc)를 단계 구분도로 작성하시오.(우리나라) (단, 환자수는 2006년부터 2015년 통합, NA인 지역은 0으로 표시할 것)
+
+```{r}
+kdata1 = kormaps2014::tbc
+kdata1[kdata1$code==29,]
+colnames(kdata1)
+kdata1$NewPts = ifelse(is.na(kdata1$NewPts), 0, kdata1$NewPts)
+kdata1 = kdata1 %>% filter(year %in% c(2006:2015)) %>% group_by(name) %>% summarise(총결핵발생자 = sum(NewPts), code = mean(code))
+
+ggChoropleth(data=kdata1, 
+             aes(fill = 총결핵발생자, 
+                 map_id = code, 
+                 tooltip = name),
+             title = '시도별 결핵환자수',
+             subtitle = "(2006~2015년 총 발생 건수)",
+             map = kormap1, interactive = TRUE)
+
+tooltips = paste0(
+  sprintf("<p><strong>%s</strong></p>", as.character(kdata1$name)),
+  sprintf("<p><strong>%.0f</strong> 명</p>", round(kdata1$총결핵발생자))) 
+# string::stri_escape_unicode('만') # windows only
+
+ggplot(kdata1, aes(data=총결핵발생자, map_id = code)) +
+  geom_map_interactive(aes(fill = 총결핵발생자,
+                           data_id = code,
+                           tooltip =tooltips), map = kormap1) + 
+  expand_limits(x = kormap1$long, y = kormap1$lat) +
+  scale_fill_gradient2("총결핵발생자", high='red') +
+  labs(title="시도별 결핵환자수", subtitle = "(2006~2015년 총 발생 건수)") -> gg_map1
+
+ggiraph(code = print(gg_map1))
+girafe(ggobj = gg_map1)
+
+```
+
