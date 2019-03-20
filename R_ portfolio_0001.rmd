@@ -1,0 +1,119 @@
+---
+title: "R portfolio 0001"
+author: "김건우"
+date: '2019년 3월 20일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r echo = FALSE}
+library(dplyr)
+library(ggplot2)
+
+theme_set(theme_gray(base_family = "AppleGothic"))
+par(family = "AppleGothic")
+load("../data/data_eng.rda")
+
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+#### 1번문제) mpg데이터에서 연도별 배기량에 따른 도시/고속도로 를 꺽은선으로 그리시오. (단, 2008년은 굵은 선으로 표현하시오)
+
+
+```{r}
+
+library('dplyr')
+library('ggplot2')
+mpg = as.data.frame(ggplot2::mpg)
+summary(mpg)
+head(mpg)
+
+ggplot(data=mpg, aes(x=displ)) +
+  geom_line(data=distinct(mpg %>% filter(year=='1999') %>% group_by(displ) %>% summarise(cty = mean(cty))), aes(y=cty, color='1999 cty')) +
+  geom_line(data=distinct(mpg %>% filter(year=='1999') %>% group_by(displ) %>% summarise(hwy = mean(hwy))), aes(y=hwy, color='1999 hwy')) +
+  geom_line(data=distinct(mpg %>% filter(year=='2008') %>% group_by(displ) %>% summarise(cty = mean(cty))), aes(y=cty, color='2008 cty'), size=1) +
+  geom_line(data=distinct(mpg %>% filter(year=='2008') %>% group_by(displ) %>% summarise(hwy = mean(hwy))), aes(y=hwy, color='2008 hwy'), size=1) +
+  scale_x_continuous("배기량(cc)") +
+  scale_y_continuous("연비(M/h)") + 
+  scale_colour_manual("", breaks = c("1999 cty", "1999 hwy", '2008 cty', '2008 hwy'),
+                      values = c('red', 'yellow', 'blue', 'lightblue')) +
+  labs(title="연도별 연비", subtitle = "굵은선은 2008년")
+
+```
+
+
+
+
+#### 2번문제) data(성적.csv) 데이터에서 국어 성적이 80점 이상인 학생들의 수를 성비가 보이도록 학급별로 막대그래프를 그리시오.
+
+```{r}
+data = read.csv("../data/성적.csv")
+summary(data)
+head(data)
+
+ggplot(data %>% filter(국어 >= 80) %>% select(반, 성별), aes(반)) +
+  geom_bar(aes(fill=성별),
+           width = 0.5) +
+  theme(axis.text.x = element_text(angle=45,       # 글씨의 기울기
+                                   vjust=0.6)) +   # 글씨의 하단 맞춤(띄우기)
+  scale_fill_discrete(name = "성별") +      # legend
+  labs(title = '국어 우수 학생', subtitle = '(80점 이상)', x='학급', y='학생수')
+```
+
+
+
+
+#### 3번문제) 국어 성적이 95점 이상인 학생들의 점수별 밀도그래프를 그리시오.
+
+```{r}
+ggplot(data %>% filter(국어 >= 95), aes(국어)) +
+  geom_density(aes(fill=factor(반)), alpha=0.5) +
+  labs(title="반별 국어 우수 성적", subtitle = "(국어 성적 A+)",
+       caption="기준 점수 >= 95",
+       x = "성적",
+       y = '밀도',
+       fill = "학급")
+```
+
+
+
+
+
+#### 4번문제) midwest데이터에서 전체인구와 아시아계 인구의 관계를 알아보기 위한 그래프를 그리시오. (단, 전체인구는 50만명 이하, 아시아계인구는 1만명 이하만 표시되게)
+
+
+
+```{r}
+library(gridExtra)
+midwest = as.data.frame(ggplot2::midwest)
+
+summary(midwest)
+head(midwest)
+colnames(midwest)
+
+d = midwest %>% filter(poptotal <= 500000 & popasian <= 10000)
+
+ggplot(d, aes(popasian, poptotal)) +
+  geom_point( alpha=0.3) +
+  labs(title='카운티별전체인구와 아시아계 인구의 관계', 
+       subtitle = '(중서부 5개 주를 대상으로)',
+       x='아시아계 인구', y='카운티별 전체인구') -> g1
+
+ggplot(d, aes(popdensity, percasian)) +
+  geom_point(alpha=0.3) +
+  labs(title='카운티별인구밀도와 아시아계 인구 비중의 관계', 
+       subtitle = '(중서부 5개 주를 대상으로)',
+       x='아시아계 인구비중', y='카운티별 전체인구밀도') -> g2
+
+ggplot(d, aes(popasian)) +
+  geom_histogram(alpha=0.3, bins=20) +
+  labs(title='아시아계 인구에 따른 카운티 분포', 
+       subtitle = '(중서부 5개 주를 대상으로)',
+       x='아시아계 인구비중', y='카운티 수') -> g3
+
+g4 = grid.arrange(g1, g2, ncol=2)
+grid.arrange(g3, g4, nrow=2)
+```
