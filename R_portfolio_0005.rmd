@@ -1,1 +1,250 @@
+---
+title: "R_portfolio_0005"
+author: "김건우"
+date: '2019년 4월 9일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+#### 네이버 뉴스 1면의 기사들을 수집하시오.(https://news.naver.com/main/home.nhn)
+
+```{r echo=FALSE}
+removeStopword = function(tw){
+  tw = gsub("\\s{2,}", " ", tw)
+  tw = gsub("[[:cntrl:]]", " ", tw)
+  tw = gsub("http[s]?://[[:alnum:].\\/]+", " ", tw)
+  tw = gsub('[[:alnum:].]+@[[:alnum:].]+', ' ', tw)
+  tw = gsub("&[[:alnum:]]+;", " ", tw)
+  tw = gsub("RT @[[:alnum:][:punct:]]+[:]?", " ", tw)
+  tw = gsub("[ㄱ-ㅎㅏ-ㅣ]"," ",tw)
+  tw = gsub("\\s{2,}", " ", tw)
+  tw = gsub("[[:punct:]]", " ", tw)
+  # tw = gsub("flash 오류를 우회하기 위한 함수 추가 function flash removeCallback",'', tw)
+  tw = gsub('flash 오류를 우회하기 위한 함수 추가','',tw)
+  tw = gsub('function flashremoveCallback',' ', tw)
+  tw = gsub("function flash removeCallback", " ", tw)
+  tw = gsub("_flash_removeCallback()", " ", tw)
+  tw = gsub('\\p{So}|\\p{Cn}', '', tw, perl = TRUE)
+  tw = gsub("\\s{2,}", " ", tw)
+}
+
+library(rvest); library(httr); library(stringr); library(dplyr)
+
+newsUrl = "https://news.naver.com/main/home.nhn"
+html = read_html(newsUrl)
+links = html_attr(html_nodes(html, '.main_component.droppable li a'), 'href')
+links = links[!is.na(links)]
+news = list()
+
+
+j = 1
+for (i in 1:5) {
+  try({
+    htxt = read_html(links[i])
+    comments = html_nodes(htxt, '#articleBodyContents')
+    get_news = repair_encoding(html_text(comments))
+    if(is.null(get_news)) next
+    
+    news[j] = str_trim(get_news)
+    j = j + 1
+    
+  }, silent = F)
+}
+news
+length(news)
+news1 = news
+
+for (i in 1:length(news1)){
+  try({news1[[i]][1] = removeStopword(news1[[i]][1])
+      news1[[i]][1] = gsub('function flashremoveCallback',' ', news1[[i]][1])}, silent = T)
+}
+```
+
+
+```
+# 네이버 뉴스 1면의 기사들을 수집하시오.(https://news.naver.com/main/home.nhn)
+
+removeStopword = function(tw){
+  tw = gsub("\\s{2,}", " ", tw)
+  tw = gsub("[[:cntrl:]]", " ", tw)
+  tw = gsub("http[s]?://[[:alnum:].\\/]+", " ", tw)
+  tw = gsub('[[:alnum:].]+@[[:alnum:].]+', ' ', tw)
+  tw = gsub("&[[:alnum:]]+;", " ", tw)
+  tw = gsub("RT @[[:alnum:][:punct:]]+[:]?", " ", tw)
+  tw = gsub("[ㄱ-ㅎㅏ-ㅣ]"," ",tw)
+  tw = gsub("\\s{2,}", " ", tw)
+  tw = gsub("[[:punct:]]", " ", tw)
+  # tw = gsub("flash 오류를 우회하기 위한 함수 추가 function flash removeCallback",'', tw)
+  tw = gsub('flash 오류를 우회하기 위한 함수 추가','',tw)
+  tw = gsub('function flashremoveCallback',' ', tw)
+  tw = gsub("function flash removeCallback", " ", tw)
+  tw = gsub("_flash_removeCallback()", " ", tw)
+  tw = gsub('\\p{So}|\\p{Cn}', '', tw, perl = TRUE)
+  tw = gsub("\\s{2,}", " ", tw)
+}
+
+library(rvest); library(httr); library(stringr); library(dplyr)
+
+newsUrl = "https://news.naver.com/main/home.nhn"
+html = read_html(newsUrl)
+links = html_attr(html_nodes(html, '.main_component.droppable li a'), 'href')
+links = links[!is.na(links)]
+news = list()
+
+
+j = 1
+for (i in 1:5) {
+  try({
+    htxt = read_html(links[i])
+    comments = html_nodes(htxt, '#articleBodyContents')
+    get_news = repair_encoding(html_text(comments))
+    if(is.null(get_news)) next
+    
+    news[j] = str_trim(get_news)
+    j = j + 1
+    
+  }, silent = F)
+}
+news
+length(news)
+news1 = news
+
+for (i in 1:length(news1)){
+  try({news1[[i]][1] = removeStopword(news1[[i]][1])
+      news1[[i]][1] = gsub('function flashremoveCallback',' ', news1[[i]][1])}, silent = T)
+}
+```
+
+
+#### 수집 된 뉴스로 WordCloud를 작도하시오.
+
+```{r echo=FALSE}
+library(dplyr);library(ggplot2)
+theme_set(theme_gray(base_family="AppleGothic"))
+par(family = "AppleGothic")
+
+library(rJava); library(KoNLP)
+
+wc = head(sapply(news1, extractNoun, USE.NAMES = F), 30)
+data_unlist = unlist(wc)
+data_unlist <- Filter(function(x){nchar(x)>=2}, data_unlist)
+wc1 = table(data_unlist)
+wc1
+names(wc1); length(wc1)
+wc2 = head(sort(wc1, decreasing = T), 100)
+
+library(RColorBrewer); library(wordcloud)
+pal = brewer.pal(9, "Set1")
+wordcloud(names(wc2), freq=wc2, scale=c(2,0.05), rot.per=0.5, 
+            min.freq = 1, random.order = F, random.color = T, colors = pal)
+```
+
+```
+
+library(rJava); library(KoNLP)
+
+wc = head(sapply(news1, extractNoun, USE.NAMES = F), 30)
+data_unlist = unlist(wc)
+data_unlist <- Filter(function(x){nchar(x)>=2}, data_unlist)
+wc1 = table(data_unlist)
+wc1
+names(wc1); length(wc1)
+wc2 = head(sort(wc1, decreasing = T), 100)
+
+library(RColorBrewer); library(wordcloud)
+pal = brewer.pal(9, "Set1")
+wordcloud(names(wc2), freq=wc2, scale=c(2,0.05), rot.per=0.5, 
+            min.freq = 1, random.order = F, random.color = T, colors = pal)
+
+```
+#### 수집 된 뉴스로 연관성을 분석하시오.
+
+```{r echo=FALSE}
+library(dplyr);library(ggplot2)
+theme_set(theme_gray(base_family="AppleGothic"))
+par(family = "AppleGothic")
+
+wc3 = head(sort(wc1, decreasing = T), 600)
+library(arules); library(igraph); library(combinat)
+
+nouns = sapply(wc, unique)
+nouns1 = sapply(nouns, function(x) {
+  Filter(function(y='') { nchar(y) > 1 && nchar(y) <= 4}, x)
+})
+wtrans = as(nouns1, "transactions")
+
+
+rules = apriori(wtrans, parameter = list(supp=0.5, conf=0.5, minlen=2, maxlen=5))
+
+library(arulesViz); library(visNetwork)
+subrules2 <- head(sort(rules, by="lift"), 20) ## lift 기준으로 상위 20개만을 시각화
+ig <- plot( subrules2, method="graph", control=list(type="items") )
+
+ig_df <- get.data.frame( ig, what = "both" )
+visNetwork(
+  nodes = data.frame(id = ig_df$vertices$name,
+                     value = ig_df$vertices$support, ig_df$vertices),
+  edges = ig_df$edges
+) %>% visEdges(ig_df$edges) %>%visOptions( highlightNearest = T )
+
+subrules2 <- head(sort(rules, by="confidence"), 30)
+ig <- plot( subrules2, method="graph", control=list(type="items") )
+# saveAsGraph seems to render bad DOT for this case
+ig_df <- get.data.frame( ig, what = "both" )
+
+ig_df <- get.data.frame( ig, what = "both" )
+visNetwork(
+  nodes = data.frame(id = ig_df$vertices$name,
+                     value = ig_df$vertices$support, ig_df$vertices),
+  edges = ig_df$edges
+) %>% visEdges(ig_df$edges) %>%visOptions( highlightNearest = T )
+```
+
+```
+# 연관성 분석
+
+wc3 = head(sort(wc1, decreasing = T), 600)
+library(arules); library(igraph); library(combinat)
+
+nouns = sapply(wc, unique)
+nouns1 = sapply(nouns, function(x) {
+  Filter(function(y='') { nchar(y) > 1 && nchar(y) <= 4}, x)
+})
+wtrans = as(nouns1, "transactions")
+
+
+rules = apriori(wtrans, parameter = list(supp=0.5, conf=0.5, minlen=2, maxlen=5))
+inspect(sort(rules))
+
+library(arulesViz); library(visNetwork)
+subrules2 <- head(sort(rules, by="lift"), 20) ## lift 기준으로 상위 20개만을 시각화
+ig <- plot( subrules2, method="graph", control=list(type="items") )
+
+ig_df <- get.data.frame( ig, what = "both" )
+visNetwork(
+  nodes = data.frame(id = ig_df$vertices$name,
+                     value = ig_df$vertices$support, ig_df$vertices),
+  edges = ig_df$edges
+) %>% visEdges(ig_df$edges) %>%visOptions( highlightNearest = T )
+
+subrules2 <- head(sort(rules, by="confidence"), 30)
+ig <- plot( subrules2, method="graph", control=list(type="items") )
+# saveAsGraph seems to render bad DOT for this case
+ig_df <- get.data.frame( ig, what = "both" )
+
+ig_df <- get.data.frame( ig, what = "both" )
+visNetwork(
+  nodes = data.frame(id = ig_df$vertices$name,
+                     value = ig_df$vertices$support, ig_df$vertices),
+  edges = ig_df$edges
+) %>% visEdges(ig_df$edges) %>%visOptions( highlightNearest = T )
+
+```
+
 
