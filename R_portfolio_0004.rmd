@@ -1,0 +1,100 @@
+---
+title: "R_portfolio_0004"
+author: "김건우"
+date: '2019년 4월 9일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggplot2)
+
+theme_set(theme_gray(base_family = "AppleGothic"))
+par(family = "AppleGothic")
+
+library(twitteR); library(RCurl); library(RJSONIO); library(stringr)
+library(streamR); library(ROAuth)
+library(rJava); library(KoNLP)
+
+library(SnowballC); library(RColorBrewer); library(wordcloud)
+
+load("../apikey/twitter.rda")
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+#### 본인이 원하는 검색어로 트위터 트윗을 가져와 워드클라우드를 작도하시오. (주의: secret key는 노출하지 마시오)
+
+ - 검색어 : 백종원
+ - 검색기간 : 2019-03-01 ~ 2019-03-24
+ - 검색건수 : 100 건
+
+```{r echo=FALSE}
+setup_twitter_oauth(keys[1],keys[2], keys[3], keys[4])
+
+draw_key_wordcolud = function(keyword, n, draw_n, since, until){
+  tweets = searchTwitter(enc2utf8(keyword), n=n, lan='ko', 
+                         since=since, until=until)
+  tdf = twListToDF(tweets)
+  tw = unique(tdf$text)
+  
+  tw = gsub("[[:cntrl:]]", "", tw)
+  tw = gsub("http[s]?://[[:alnum:].\\/]+", "", tw)
+  tw = gsub("&[[:alnum:]]+;", "", tw)
+  tw = gsub("RT @[[:alnum:][:punct:]]+[:]?", "", tw)
+  tw = gsub("[ㄱ-ㅎㅏ-ㅣ]","",tw)
+  tw = gsub("\\s{2,}", " ", tw)
+  tw = gsub("[[:punct:]]", "", tw)
+  tw = gsub('\\p{So}|\\p{Cn}', '', tw, perl = TRUE)
+  
+  wc = sapply(tw, extractNoun, USE.NAMES = F)
+  ul = unlist(wc)
+  ul = ul[nchar(ul) > 1]
+  wc1 = table(ul)
+  wc2 = head(sort(wc1, decreasing = T), draw_n)
+  
+  pal = brewer.pal(9, "Set1")
+  wordcloud(names(wc2), freq=wc2, scale=c(5, 0.5), rot.per=0.25, 
+            min.freq = 1, random.order = F, random.color = T, colors = pal)
+}
+
+```
+
+```{r}
+theme_set(theme_gray(base_family = "AppleGothic"))
+par(family = "AppleGothic")
+
+draw_key_wordcolud(keyword = "백종원", n = 100, draw_n = 20, since = '2019-03-01', until = '2019-03-24')
+```
+
+
+```
+keyword = "백종원"; n = 100; draw_n = 20; since = '2019-03-01'; until = '2019-03-24'
+
+tweets = searchTwitter(enc2utf8(keyword), n=n, lan='ko', 
+                         since=since, until=until)
+tdf = twListToDF(tweets)
+tw = unique(tdf$text)
+  
+tw = gsub("[[:cntrl:]]", "", tw)
+tw = gsub("http[s]?://[[:alnum:].\\/]+", "", tw)
+tw = gsub("&[[:alnum:]]+;", "", tw)
+tw = gsub("RT @[[:alnum:][:punct:]]+[:]?", "", tw)
+tw = gsub("[ㄱ-ㅎㅏ-ㅣ]","",tw)
+tw = gsub("\\s{2,}", " ", tw)
+tw = gsub("[[:punct:]]", "", tw)
+tw = gsub('\\p{So}|\\p{Cn}', '', tw, perl = TRUE)
+
+wc = sapply(tw, extractNoun, USE.NAMES = F)
+ul = unlist(wc)
+ul = ul[nchar(ul) > 1]
+wc1 = table(ul)
+wc2 = head(sort(wc1, decreasing = T), draw_n)
+  
+pal = brewer.pal(9, "Set1")
+wordcloud(names(wc2), freq=wc2, scale=c(5, 0.5), rot.per=0.25, 
+          min.freq = 1, random.order = F, random.color = T, colors = pal)
+```
