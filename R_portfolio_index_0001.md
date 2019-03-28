@@ -12,5 +12,5 @@
   + [트위터 API를 통한 트윗 수집 및 워드 클라우드](https://github.com/Gouwon/Report/blob/master/R_portfolio_0004.html)
   + [트위터 API를 통한 트윗 수집 및 워드 클라우드 R 마크다운](https://github.com/Gouwon/Report/blob/master/R_portfolio_0004.rmd) 
   
-  + [[네이버 뉴스를 통한 기사 수집 및 워드 클라우드 / 연관성 분석]](https://github.com/Gouwon/Report/blob/master/R_portfolio_0005.html)
+  + [네이버 뉴스를 통한 기사 수집 및 워드 클라우드 / 연관성 분석](https://github.com/Gouwon/Report/blob/master/R_portfolio_0005.html)
   + [네이버 뉴스를 통한 기사 수집 및 워드 클라우드 / 연관성 분석 R 마크다운](https://github.com/Gouwon/Report/blob/master/R_portfolio_0005.rmd) 
