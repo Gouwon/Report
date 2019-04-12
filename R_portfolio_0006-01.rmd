@@ -1,0 +1,145 @@
+---
+title: "R portfolio 0006-01"
+author: "김건우"
+date: '2019년 3월 8일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r echo = FALSE}
+library(dplyr)
+library(ggplot2)
+
+theme_set(theme_gray(base_family = "AppleGothic"))
+par(family = "AppleGothic")
+load('data/data.rda')
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+
+
+#### 1번문제) '죽반과 매반의 수학성적은 차이가 없다'라는 가설을 검정하시오.
+
+  H0 : 죽반과 매반의 수학성적은 같다.
+  H1 : 죽반과 매반의 수학성적은 다르다.
+  
+  죽반과 매반이라는 2개 이상의 집단을 비교함으로 독립표본 검정(평균차이검정)을 한다.
+  
+##### 1. 데이터 분석(표본 및 기술 통계 확인)
+
+```
+data %>% filter(반 %in% c('매', '죽')) %>% select(반, 수학) -> sampledata
+
+head(sampledata)
+summary(sampledata)
+
+sampledata$반 = factor(sampledata$반, levels=c('매', '죽'), labels=c('매', '죽'))
+
+library(psych)
+describeBy(sampledata$수학, sampledata$반, mat = T)
+```
+
+```{r, echo=FALSE}
+data %>% filter(반 %in% c('매', '죽')) %>% select(반, 수학) -> sampledata
+
+head(sampledata)
+summary(sampledata)
+
+sampledata$반 = factor(sampledata$반, levels=c('매', '죽'), labels=c('매', '죽'))
+
+library(psych)
+describeBy(sampledata$수학, sampledata$반, mat = T)
+```
+
+##### 2. 데이터 분석(표본 데이터 확인)
+
+```
+orgpar = par(no.readonly = T) 
+boxplot(sampledata$수학 ~ sampledata$반)
+layout(matrix(c(1,1,2,3), 2, 2, byrow = T))
+boxplot(sampledata$수학 ~ sampledata$반)
+hist(sampledata$수학[sampledata$반 == '매'])
+hist(sampledata$수학[sampledata$반 == '죽'])
+par(orgpar)
+```
+
+```{r, echo=FALSE}
+orgpar = par(no.readonly = T) 
+boxplot(sampledata$수학 ~ sampledata$반)
+layout(matrix(c(1,1,2,3), 2, 2, byrow = T))
+boxplot(sampledata$수학 ~ sampledata$반)
+hist(sampledata$수학[sampledata$반 == '매'])
+hist(sampledata$수학[sampledata$반 == '죽'])
+par(orgpar)
+```
+
+
+##### 3. 등분산 검정
+
+  H0 : 두 집단의 분산은 같다.
+  H1 : 두 집단의 분산은 다르다.
+
+```{r}
+var.test(sampledata$수학 ~ sampledata$반, data = sampledata)
+```
+
+  0.05 < p-value(0.876)임으로 귀무가설을 기각하지 못한다. 따라서 두 집단의 분산은 다르다고 할 수 없다.
+  
+##### 4. 독립 표본 검증
+  
+```{r}
+t.test(sampledata$수학 ~ sampledata$반, data = sampledata,
+         alternative = c("two.sided"),
+         var.equal = T,               
+         conf.level = 0.95)   
+```
+
+  등분산검증의 p-value < 0.05 이면 False이다.
+  p-value = 0.901 > 0.05(=1-a)임으로 귀무가설(죽반과 매반의 수학성적은 같다.) 을 기각하지 못한다.
+  
+
+##### 5. 결과 graph 작도
+
+```
+#describeBy의 첫번째 그룹의 mean, se
+mu = 63.84167; se = 2.114145; rn = sort(rnorm(120, mu, se))
+plot(rn, dnorm(rn, mu, se), col='green', type = 'l', main = '평균점수',
+       xlim = c(55, 75), ylim = c(0, 0.25)) 
+abline(v=mu, col="green", lty=5)
+
+# 겹쳐 그리기
+par(new = T)          
+
+#describeBy의 두번째 그룹의 mean, se
+mu =63.46667; se = 2.144661; rn = sort(rnorm(120, mu, se)) 
+plot(rn, dnorm(rn, mu, se), col='red', type = 'l', main = '평균점수',
+       xlim = c(55, 75), ylim = c(0, 0.25))
+abline(v=mu, col="red", lty=5)
+par(orgpar)
+```
+
+```{r, echo=FALSE}
+#describeBy의 첫번째 그룹의 mean, se
+mu = 63.84167; se = 2.114145; rn = sort(rnorm(120, mu, se))
+plot(rn, dnorm(rn, mu, se), col='green', type = 'l', main = '평균점수',
+       xlim = c(55, 75), ylim = c(0, 0.25)) 
+abline(v=mu, col="green", lty=5)
+
+# 겹쳐 그리기
+par(new = T)          
+
+#describeBy의 두번째 그룹의 mean, se
+mu =63.46667; se = 2.144661; rn = sort(rnorm(120, mu, se)) 
+plot(rn, dnorm(rn, mu, se), col='red', type = 'l', main = '평균점수',
+       xlim = c(55, 75), ylim = c(0, 0.25))
+abline(v=mu, col="red", lty=5)
+par(orgpar)
+```
+
+  결론 : 죽반과 매반의 수학 성적은 다르다고 할 수 없다.
+  
+
