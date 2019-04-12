@@ -1,5 +1,5 @@
 ---
-title: "R portfolio 0006-1"
+title: "R portfolio 0006-2"
 author: "김건우"
 date: '2019년 3월 8일 '
 output: html_document
