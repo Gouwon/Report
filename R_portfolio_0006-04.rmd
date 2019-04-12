@@ -1,0 +1,75 @@
+---
+title: "R portfolio 0006-04"
+author: "김건우"
+date: '2019년 3월 8일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r echo = FALSE}
+library(dplyr)
+library(ggplot2)
+library(psych)
+
+theme_set(theme_gray(base_family = "AppleGothic"))
+par(family = "AppleGothic")
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+
+
+#### 4번 문제) mpg데이터의 displ, cyl, trans, cty, hwy 중 1999년과 2008년 두 해의 고객 만족도가 0과 1이라고 했을 때, 어떤 요소가 만족도에 많은 기여를 했는지 로지스틱 회귀분석하시오.
+
+
+##### 1. 데이터 준비
+
+```{r}
+library(ggplot2)
+mpg = as.data.frame(ggplot2::mpg)
+
+unique(mpg$trans); unique(mpg$year)
+
+sampledata3 = mpg %>%
+              mutate(trs = ifelse(substr(trans, 1, 4) == 'auto', 1, 0), 
+              y = ifelse(year == 1999, 0, 1)) %>%
+              select(y, displ, cyl, trs, cty, hwy)
+
+head(sampledata3, 10)
+```
+
+
+##### 2. 기본 통계치 확인
+
+```{r}
+library('psych')
+describe(sampledata3)
+pairs.panels(sampledata3)
+```
+
+
+##### 3. 분석
+
+```{r}
+glmdata = glm(y ~ displ+cyl+cty+hwy+trs, family = binomial, data=sampledata3)
+summary(glmdata)
+```
+
+```{r}
+orgpar = par(no.readonly = T) 
+par(mfrow=c(2,2)) 
+plot(glmdata)
+par(orgpar)
+```
+
+
+##### 4. coefficients(기울기+절편)와 confint(신뢰구간)로 LOR(Log Odd Ratio) 구하기
+
+```{r}
+round(exp(cbind(LOR = coef(glmdata), confint(glmdata))), 2)
+```
+
+  결론 : 고객의 만족도에 영향을 주는 요인은 displ, hwy이며 이들은 고객의 만족도와 양의 상관관계를            가지고 있다. 나머지 cyl, cty, trs의 경우 통계적 유의성을 가지지 않기 때문에 이들에 대해서는          따로 분석을 해 볼 필요가 있다.
