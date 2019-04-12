@@ -1,0 +1,156 @@
+---
+title: "R portfolio 0006-1"
+author: "김건우"
+date: '2019년 3월 8일 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r echo = FALSE}
+library(dplyr)
+library(ggplot2)
+library(psych)
+
+theme_set(theme_gray(base_family = "AppleGothic"))
+par(family = "AppleGothic")
+load("../data/data_eng.rda")
+```
+
+----
+##### 본 문서는 R markdown으로 작성되었습니다.
+
+
+
+#### 2번문제) 4개반 수학성적의 유사도(동질의 정도)를 분석하시오.
+
+  H0 : 4개반의 수학성적은 같다.
+  H1 : 4개반 중 1개라도 수학성적이 다르다.
+  
+  3개 이상의 집단에 대한 분석임으로 ANOVA 분석을 실시한다.
+  
+##### 1. 데이터 분석(표본 및 기술 통계 확인)
+
+```
+data %>% select(반, 수학) -> sampledata1
+describeBy(sampledata1$수학, sampledata1$반, mat = T) -> summary_sampledata1
+```
+```{r, echo=FALSE}
+data %>% select(cls, math) -> sampledata1
+describeBy(sampledata1$math, sampledata1$cls, mat = T) -> summary_sampledata1
+head(summary_sampledata1, 10)
+summary_sampledata1 %>% select(group1, mean, se) -> summary_sampledata1
+summary_sampledata1
+```
+
+##### 2. 데이터 분석(표본 데이터 확인)
+
+```
+library(ggplot2)
+ggplot(sampledata1, aes(x=cls, y=math)) +
+  geom_boxplot(outlier.color = 'blue') +
+  ggtitle("각반 수학 성적")
+
+ggplot(sampledata1, aes(x=math)) +
+  geom_histogram(binwidth = 10, col='white') +
+  facet_grid(. ~ sampledata1$cls)
+```
+
+```{r, echo=FALSE}
+library(ggplot2)
+ggplot(sampledata1, aes(x=cls, y=math)) +
+  geom_boxplot(outlier.color = 'blue') +
+  ggtitle("각반 수학 성적")
+
+ggplot(sampledata1, aes(x=math)) +
+  geom_histogram(binwidth = 10, col='white') +
+  facet_grid(. ~ sampledata1$cls)
+```
+
+##### 3. 등분산 검정
+
+  H0 : 각 집단의 분산은 같다.
+  H1 : 적어도 하나의 집단의 분산은 다르다.
+
+```{r}
+bartlett.test(sampledata1$math ~ sampledata1$cls, data=sampledata1)
+```
+
+  p-value = 0.8893
+  p-value > 0.05임으로 귀무가설을 기각하지 못한다. 따라서 4개반의 분산은 다르다고 할 수 없다.
+  
+
+##### 4. ANOVA
+
+```{r}
+aaa = aov(data$kor ~ data$cls, data=data)
+summary(aaa)  
+```
+
+##### 4-1. 사후검정
+
+```{r}
+TukeyHSD(aaa)
+```
+
+##### 4-2. 동질성 결과 graph
+
+```{r}
+plot(TukeyHSD(aaa))
+```
+
+##### 5. 결과 graph 작도
+
+```{r}
+draw = function(rn, mu, se, col) {
+  plot(rn, dnorm(rn, mu, se), col=col, type = 'l',
+       xlim = c(50, 80), ylim = c(0, 0.25))
+  abline(v=mu, col=col, lty=5)
+}
+```
+
+```
+mu = 62.6; se = 2.097331; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'red')
+par(new = T)
+mu = 59.4; se = 1.975140; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'blue')
+par(new = T)
+mu = 64.2833; se = 1.9523; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'darkgreen')
+par(new = T)
+mu = 66.6; se = 1.964653; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'black')
+par(orgpar)
+
+legend('topright',
+       legend=c('국', '난', '매', '죽'),
+       pch=8,
+       col=c('red', 'blue', 'darkgreen', 'black'),
+       bg='gray')
+```
+
+```{r, echo=FALSE}
+orgpar = par(no.readonly = T) 
+mu = 62.6; se = 2.097331; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'red')
+par(new = T)
+mu = 59.4; se = 1.975140; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'blue')
+par(new = T)
+mu = 64.2833; se = 1.9523; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'darkgreen')
+par(new = T)
+mu = 66.6; se = 1.964653; rn = sort(rnorm(1000, mu, se))
+draw(rn, mu, se, 'black')
+par(orgpar)
+
+legend('topright',
+       legend=c('국', '난', '매', '죽'),
+       pch=8,
+       col=c('red', 'blue', 'darkgreen', 'black'),
+       bg='gray')
+```
+
+  결론 : 4개반의 수학 성적은 동질하지 않다고 할 수 없다.
